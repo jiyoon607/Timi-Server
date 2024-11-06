@@ -28,3 +28,9 @@ class Days(models.Model):
     start_time = models.TimeField(null=False, default=datetime.time(9, 0, 0), verbose_name='시작 시간')
     end_time = models.TimeField(null=False, default=datetime.time(22, 0, 0), verbose_name='종료 시간')
 
+
+class CustomUser(models.Model):
+    id = models.AutoField(primary_key=True)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    name = models.CharField(max_length=10)
+    password = models.CharField(max_length=10, null=True, blank=True)
