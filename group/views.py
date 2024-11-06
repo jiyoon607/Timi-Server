@@ -1,5 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, mixins, status
+from rest_framework.decorators import action
+from datetime import datetime
 from .models import *
 from .serializers import *
 
@@ -38,3 +40,17 @@ class CreateGroupViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
         response_data = group_serializer.data
         response_data['days'] = created_days
         return Response(response_data, status=status.HTTP_201_CREATED)
+
+    @action(methods=["GET"], detail=False)
+    def today(self, request):
+        today = datetime.datetime.today()
+        month = today.month
+        day = today.day
+        weekday = today.strftime("%a")  # 요일을 문자열로 변환
+
+        data = {
+            "month": month,
+            "day": day,
+            "weekday":weekday
+        }
+        return Response(data)
