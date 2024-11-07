@@ -31,6 +31,6 @@ class Days(models.Model):
 
 class CustomUser(models.Model):
     id = models.AutoField(primary_key=True)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    group_id = models.ForeignKey(Group, on_delete=models.CASCADE)
     name = models.CharField(max_length=10)
     password = models.CharField(max_length=10, null=True, blank=True)
