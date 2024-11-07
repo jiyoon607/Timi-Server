@@ -12,6 +12,7 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    group_id = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = CustomUser
         fields = '__all__'

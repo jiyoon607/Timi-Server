@@ -8,5 +8,6 @@ default_router = routers.SimpleRouter(trailing_slash=False)
 default_router.register("group", CreateGroupViewSet, basename="group")
 
 urlpatterns = [
-    path("", include(default_router.urls))
+    path("", include(default_router.urls)),
+    path("group/<int:group_id>/login", customuser_create, name="customuser-create")
 ]
