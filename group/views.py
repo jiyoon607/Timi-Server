@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from datetime import datetime
 from .models import *
 from .serializers import *
-
+from rest_framework.decorators import api_view
 # Create your views here.
 class GroupViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
     serializer_class = GroupSerializer
@@ -59,3 +59,15 @@ class GroupViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Retr
             }
             data.append(temp_data)  # 수정된 부분
         return Response(data)
+    
+
+@api_view(['POST'])
+def customuser_create(request, group_id):
+    if request.method == 'POST':
+        data = request.data.copy()  # 요청 데이터를 복사
+        serializer = CustomUserSerializer(data=data, context={'request': request})
+        
+        if serializer.is_valid(raise_exception=True):
+            # save() 메서드에서 group_id를 설정하여 저장
+            serializer.save(group_id_id=group_id)
+            return Response(data=serializer.data)
