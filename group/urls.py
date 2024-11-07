@@ -5,7 +5,7 @@ from .views import *
 app_name = "group"
 
 default_router = routers.SimpleRouter(trailing_slash=False)
-default_router.register("group", CreateGroupViewSet, basename="group")
+default_router.register("group", GroupViewSet, basename="group")
 
 urlpatterns = [
     path("", include(default_router.urls)),
