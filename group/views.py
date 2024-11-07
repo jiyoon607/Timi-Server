@@ -6,8 +6,11 @@ from .models import *
 from .serializers import *
 
 # Create your views here.
-class CreateGroupViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
+class GroupViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
     serializer_class = GroupSerializer
+
+    def get_queryset(self):
+        return Group.objects.all()
 
     def create(self, request, *args, **kwargs):
         group_data = {
@@ -44,13 +47,15 @@ class CreateGroupViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
     @action(methods=["GET"], detail=False)
     def today(self, request):
         today = datetime.datetime.today()
-        month = today.month
-        day = today.day
-        weekday = today.strftime("%a")  # 요일을 문자열로 변환
-
-        data = {
-            "month": month,
-            "day": day,
-            "weekday":weekday
-        }
+        print(today)
+        data = []
+        plus = datetime.timedelta(days=1)
+        for i in range(0, 35):
+            temp_day = today + plus * i
+            temp_data = {
+                'month': temp_day.month,
+                'day': temp_day.day,
+                'weekday': temp_day.strftime("%a")
+            }
+            data.append(temp_data)  # 수정된 부분
         return Response(data)

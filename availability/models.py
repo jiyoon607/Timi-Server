@@ -11,4 +11,4 @@ class Availability(models.Model):
     time_to = models.TimeField(null=False, default=datetime.time(0, 0, 0), verbose_name='가능 종료 시간')
 
     def __str__(self):
-        return self.name
+        return f'{self.user.name}의 가능 시간 : {self.time_from} ~ {self.time_to}'

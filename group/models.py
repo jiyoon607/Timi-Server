@@ -28,6 +28,9 @@ class Days(models.Model):
     start_time = models.TimeField(null=False, default=datetime.time(9, 0, 0), verbose_name='시작 시간')
     end_time = models.TimeField(null=False, default=datetime.time(22, 0, 0), verbose_name='종료 시간')
 
+    def __str__(self):
+        return f'{self.group.name}: {self.day}'
+
 
 class CustomUser(models.Model):
     id = models.AutoField(primary_key=True)
