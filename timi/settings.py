@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "group",
     "comment",
     "availability",
+    "result",
 ]
 
 MIDDLEWARE = [
