@@ -23,4 +23,5 @@ urlpatterns = [
     path("api/v1/", include('group.urls')),
     path("api/v1/", include('comment.urls')),
     path("api/v1/", include('availability.urls')),
+    path("api/v1/", include('result.urls')),
 ]
