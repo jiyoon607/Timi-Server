@@ -7,6 +7,7 @@ from .models import *
 from group.models import Group, Days
 from .serializers import *
 from group.serializers import DaysSerializer
+from comment.models import Comment
 from django.core.exceptions import ValidationError
 
 
@@ -50,3 +51,42 @@ class AvailiabilityViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(availability_queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['post'])
+    def availability_detail(self, request):
+        group = request.data.get('group')
+        day = request.data.get('day')
+        date = request.data.get('date')
+        time = request.data.get('time')
+
+        if not all([group, day, time]):
+            return Response({"error": "group, day, and time are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        days = get_object_or_404(Days, group=group, day=day, date=date)
+        day_availabilitys = Availability.objects.filter(days=days)
+        time_availabilitys = day_availabilitys.filter(time_from__lte=time, time_to__gt=time)
+        group_users = CustomUser.objects.filter(group_id=group)
+
+        available_user = []
+        unavailable_user = []
+        for user in group_users:
+            if time_availabilitys.filter(user=user).exists():
+                available_user.append(user.name)
+            else:
+                unavailable_user.append(user.name)
+
+        comments = Comment.objects.filter(days=days, time=time)
+
+        comments_data = []
+        for comment in comments:
+            comments_data.append({
+                'user':comment.user.name,
+                'text':comment.text,
+                'created_at':comment.created_at
+            })
+        data = {
+            'available_user':available_user,
+            'unavailable_user':unavailable_user,
+            'comments_data':comments_data
+        }
+        return Response(data, status=status.HTTP_200_OK)
