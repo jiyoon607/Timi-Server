@@ -53,7 +53,7 @@ class AvailiabilityViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['post'])
-    def availability_detail(self, request):
+    def availabilitydetail(self, request):
         group = request.data.get('group')
         day = request.data.get('day')
         date = request.data.get('date')
