@@ -53,6 +53,7 @@ class GroupViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Retr
         for i in range(0, 35):
             temp_day = today + plus * i
             temp_data = {
+                'year': temp_day.year,
                 'month': temp_day.month,
                 'day': temp_day.day,
                 'weekday': temp_day.strftime("%a")
