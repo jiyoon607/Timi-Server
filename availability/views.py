@@ -7,6 +7,8 @@ from .models import *
 from group.models import Group, Days
 from .serializers import *
 from group.serializers import DaysSerializer
+from django.core.exceptions import ValidationError
+
 
 # Create your views here.
 class GroupTimetableViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
