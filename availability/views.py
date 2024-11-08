@@ -27,3 +27,24 @@ class GroupTimetableViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         serialized_days = DaysSlotSerializer(days, many=True)
 
         return Response(serialized_days.data)
+
+class AvailiabilityViewSet(viewsets.ModelViewSet):
+    queryset = Availability.objects.all()
+    serializer_class = AvailabilitySerializer
+
+    def perform_create(self, serializer):
+        user_pk = self.request.data.get('user')
+        try:
+            user = CustomUser.objects.get(pk=user_pk) 
+            serializer.save(user=user)  
+        except CustomUser.DoesNotExist:
+            raise ValidationError("User not found")
+
+    @action(detail=False, methods=['get'], url_path='(?P<user_id>[^/.]+)')
+    def list_user_availability(self, request, user_id=None):
+        availability_queryset = Availability.objects.filter(user_id=user_id)
+        if not availability_queryset.exists():
+            return Response({"detail": "No availability data found for this user."}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = self.get_serializer(availability_queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

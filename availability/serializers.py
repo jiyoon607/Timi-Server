@@ -4,6 +4,7 @@ from group.models import Days
 from group.serializers import DaysSerializer
 
 class AvailabilitySerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
     class Meta:
         model = Availability
         fields = '__all__'

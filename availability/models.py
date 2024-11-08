@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from group.models import CustomUser, Days
+from group.models import *
 # Create your models here.
 
 class Availability(models.Model):
@@ -24,3 +24,4 @@ class Slot(models.Model):
     
     class Meta:
         unique_together = ('days', 'time')
+
