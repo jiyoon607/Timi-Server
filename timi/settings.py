@@ -146,7 +146,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # corsheaders
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
 # 로컬 개발용 주소
@@ -155,4 +155,5 @@ CORS_ALLOWED_ORIGINS = [
 'http://127.0.0.1:3000',
 'http://127.0.0.1:5173',
 # 프론트엔드 도메인 또는 IP주소
+'https://timi4line.vercel.app'
 ]
