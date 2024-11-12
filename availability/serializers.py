@@ -5,10 +5,12 @@ from group.serializers import DaysSerializer
 
 class AvailabilitySerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
+    username = serializers.CharField(source='user.name', read_only=True)  # user.name을 username으로 추가
+
     class Meta:
         model = Availability
-        fields = '__all__'
-
+        fields = ['id', 'user', 'username', 'days', 'time_from', 'time_to']
+        
 class SlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Slot
