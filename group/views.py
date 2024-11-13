@@ -43,6 +43,16 @@ class GroupViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Retr
         response_data = group_serializer.data
         response_data['days'] = created_days
         return Response(response_data, status=status.HTTP_201_CREATED)
+    
+    def retrieve(self, request, *args, **kwargs):
+        group = self.get_object()
+        user_count = CustomUser.objects.filter(group_id=group).count()
+
+        serializer = self.get_serializer(group)
+        data = serializer.data
+        data['user_count'] = user_count
+
+        return Response(data)
 
     @action(methods=["GET"], detail=False)
     def today(self, request):
