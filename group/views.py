@@ -75,10 +75,25 @@ class GroupViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Retr
 @api_view(['POST'])
 def customuser_create(request, group_id):
     if request.method == 'POST':
-        data = request.data.copy()  # 요청 데이터를 복사
+        name = request.data.get('name')
+        password = request.data.get('password')
+        
+
+        existing_user = CustomUser.objects.filter(group_id=group_id, name=name).first()
+        
+        if existing_user:
+            if existing_user.password != password:
+                return Response(
+                    {"detail": "비밀번호가 틀렸습니다."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            serializer = CustomUserSerializer(existing_user)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        
+        data = request.data.copy() 
         serializer = CustomUserSerializer(data=data, context={'request': request})
         
         if serializer.is_valid(raise_exception=True):
-            # save() 메서드에서 group_id를 설정하여 저장
             serializer.save(group_id_id=group_id)
-            return Response(data=serializer.data)
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+

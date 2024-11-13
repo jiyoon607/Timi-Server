@@ -31,45 +31,46 @@ class GroupTimetableViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
         return Response(serialized_days.data)
 
-class AvailiabilityViewSet(viewsets.ModelViewSet):
+
+class AvailabilityViewSet(viewsets.ModelViewSet):
     queryset = Availability.objects.all()
     serializer_class = AvailabilitySerializer
 
     def perform_create(self, serializer):
         user_pk = self.request.data.get('user')
-        days_pk = self.request.data.get('days')
+        day = self.request.data.get('day')
+        date = self.request.data.get('date', None)  
         time_from = self.request.data.get('time_from')
         time_to = self.request.data.get('time_to')
 
         try:
             user = CustomUser.objects.get(pk=user_pk)
-            days = Days.objects.get(pk=days_pk)
-            
-            time_from = datetime.datetime.strptime(time_from, "%H:%M:%S").time()
-            time_to = datetime.datetime.strptime(time_to, "%H:%M:%S").time()
-            
-            current_time = time_from
-            while current_time < time_to:
-                slot = Slot.objects.filter(days=days, time=current_time).first()
-                
-                if slot:
-                    # Slot이 존재하면 availability_count를 증가
-                    slot.availability_count += 1
-                    slot.save()
-                else:
-                    # Slot이 없으면 새로 생성
-                    Slot.objects.create(
-                        days=days,
-                        time=current_time,
-                        availability_count=1
-                    )
 
+            # date 유무에 따른 days 조회 로직
+            days_queryset = Days.objects.filter(group=user.group_id, day=day)
+            days = days_queryset.filter(date=date).first() if date else days_queryset.filter(date__isnull=True).first()
+
+            if not days:
+                raise ValidationError("No matching Days entry found for the given group, day, and date.")
+
+            # availability slots 업데이트
+            current_time = datetime.datetime.strptime(time_from, "%H:%M:%S").time()
+            end_time = datetime.datetime.strptime(time_to, "%H:%M:%S").time()
+
+            while current_time < end_time:
+                slot, created = Slot.objects.get_or_create(days=days, time=current_time)
+                slot.availability_count += 1
+                slot.save()
                 current_time = (datetime.datetime.combine(datetime.date.today(), current_time) +
                                 datetime.timedelta(minutes=30)).time()
-                
-            serializer.save(user=user)  
+
+            # Availability 인스턴스를 days와 함께 저장
+            serializer.save(user=user, days=days)
+            
         except CustomUser.DoesNotExist:
             raise ValidationError("User not found")
+
+
 
     @action(detail=False, methods=['get'], url_path='(?P<user_id>[^/.]+)')
     def list_user_availability(self, request, user_id=None):
