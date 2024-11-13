@@ -37,8 +37,6 @@ class AvailabilitySerializer(serializers.ModelSerializer):
         validated_data['days'] = days
         return super().create(validated_data)
 
-
-        
 class SlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Slot
