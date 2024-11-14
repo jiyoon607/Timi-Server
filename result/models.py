@@ -5,4 +5,5 @@ from group.models import *
 class Result(models.Model):
     id = models.AutoField(primary_key=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    text = models.TextField(max_length=200)
+    place = models.CharField(max_length=200)
+    time = models.CharField(max_length=200)
