@@ -11,4 +11,5 @@ default_router.register("availability", AvailabilityViewSet, basename="availabil
 urlpatterns = [
     path("", include(default_router.urls)),
     path('availability/<int:user_id>/', AvailabilityViewSet.as_view({'get': 'list_user_availability'}), name='user-availability'),
+    path('availability/<int:user_id>', AvailabilityViewSet.as_view({'delete': 'delete_user_availability'}), name='delete-user-availability'),
 ]
