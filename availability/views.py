@@ -114,3 +114,42 @@ class AvailabilityViewSet(viewsets.ModelViewSet):
 
         availability_queryset.delete()
         return Response({"detail": f"User ID {pk}의 Availability 데이터가 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
+    
+    @action(detail=False, methods=['post'])
+    def availabilitydetail(self, request):
+        group = request.data.get('group')
+        day = request.data.get('day')
+        date = request.data.get('date')
+        time = request.data.get('time')
+
+        if not all([group, day, time]):
+            return Response({"error": "group, day, and time are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        days = get_object_or_404(Days, group=group, day=day, date=date)
+        day_availabilitys = Availability.objects.filter(days=days)
+        time_availabilitys = day_availabilitys.filter(time_from__lte=time, time_to__gt=time)
+        group_users = CustomUser.objects.filter(group_id=group)
+
+        available_user = []
+        unavailable_user = []
+        for user in group_users:
+            if time_availabilitys.filter(user=user).exists():
+                available_user.append(user.name)
+            else:
+                unavailable_user.append(user.name)
+
+        comments = Comment.objects.filter(days=days, time=time)
+
+        comments_data = []
+        for comment in comments:
+            comments_data.append({
+                'user':comment.user.name,
+                'text':comment.text,
+                'created_at':comment.created_at
+            })
+        data = {
+            'available_user':available_user,
+            'unavailable_user':unavailable_user,
+            'comments_data':comments_data
+        }
+        return Response(data, status=status.HTTP_200_OK)
