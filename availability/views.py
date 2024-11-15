@@ -39,21 +39,21 @@ class AvailabilityViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user_pk = self.request.data.get('user')
         day = self.request.data.get('day')
-        date = self.request.data.get('date', None)  
+        date = self.request.data.get('date', None)
         time_from = self.request.data.get('time_from')
         time_to = self.request.data.get('time_to')
 
         try:
             user = CustomUser.objects.get(pk=user_pk)
 
-            # date 유무에 따른 days 조회 로직
+            # day와 date에 맞는 Days 객체를 찾음
             days_queryset = Days.objects.filter(group=user.group_id, day=day)
             days = days_queryset.filter(date=date).first() if date else days_queryset.filter(date__isnull=True).first()
 
             if not days:
-                raise ValidationError("No matching Days entry found for the given group, day, and date.")
+                raise ValidationError("해당 그룹, 요일, 날짜에 일치하는 Days 항목이 없습니다.")
 
-            # availability slots 업데이트
+            # 슬롯 업데이트
             current_time = datetime.datetime.strptime(time_from, "%H:%M:%S").time()
             end_time = datetime.datetime.strptime(time_to, "%H:%M:%S").time()
 
@@ -64,11 +64,13 @@ class AvailabilityViewSet(viewsets.ModelViewSet):
                 current_time = (datetime.datetime.combine(datetime.date.today(), current_time) +
                                 datetime.timedelta(minutes=30)).time()
 
-            # Availability 인스턴스를 days와 함께 저장
-            serializer.save(user=user, days=days)
-            
+            # Availability 인스턴스를 저장하고 Days 정보 포함하여 응답
+            availability = serializer.save(user=user, days=days)
+            response_serializer = self.get_serializer(availability)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
         except CustomUser.DoesNotExist:
-            raise ValidationError("User not found")
+            raise ValidationError("사용자를 찾을 수 없습니다.")
 
 
 
