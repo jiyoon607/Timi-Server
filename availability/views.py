@@ -143,6 +143,7 @@ class AvailabilityViewSet(viewsets.ModelViewSet):
         comments_data = []
         for comment in comments:
             comments_data.append({
+                'id': comment.id,
                 'user':comment.user.name,
                 'text':comment.text,
                 'created_at':comment.created_at
