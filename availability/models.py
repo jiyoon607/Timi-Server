@@ -12,6 +12,34 @@ class Availability(models.Model):
 
     def __str__(self):
         return f'{self.user.name}의 가능 시간 : {self.time_from} ~ {self.time_to}'
+
+    def delete(self, *args, **kwargs):
+        """
+        Availability 삭제 시 Slot 업데이트 및 필요하면 삭제
+        """
+        current_time = self.time_from
+        while current_time < self.time_to:
+            try:
+                # 관련 Slot 찾기
+                slot = Slot.objects.get(days=self.days, time=current_time)
+                # availability_count 감소
+                if slot.availability_count > 0:
+                    slot.availability_count -= 1
+                    slot.save()
+
+                # availability_count가 0이면 Slot 삭제
+                if slot.availability_count == 0:
+                    slot.delete()
+            except Slot.DoesNotExist:
+                pass
+
+            # 시간 증가 (30분 단위)
+            current_time = (datetime.datetime.combine(datetime.date.today(), current_time) +
+                            datetime.timedelta(minutes=30)).time()
+
+        # Availability 삭제
+        super().delete(*args, **kwargs)
+
     
 class Slot(models.Model):
     id = models.AutoField(primary_key=True)
