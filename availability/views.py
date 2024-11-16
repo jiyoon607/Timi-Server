@@ -43,7 +43,10 @@ class AvailabilityViewSet(viewsets.ModelViewSet):
         date = self.request.data.get('date', None)
         time_from = self.request.data.get('time_from')
         time_to = self.request.data.get('time_to')
-
+        if time_from == '24:00:00':
+            time_from = datetime.time(23, 59, 59)
+        if time_to == '24:00:00':
+            time_to = datetime.time(23, 59, 59)
         try:
             user = CustomUser.objects.get(pk=user_pk)
 
