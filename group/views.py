@@ -22,7 +22,6 @@ class GroupViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Retr
             start_time = datetime.time(23, 59, 59)
         if end_time == '24:00:00':
             end_time = datetime.time(23, 59, 59)
-            print('brfore')
         group_serializer = self.get_serializer(data=group_data)
         group_serializer.is_valid(raise_exception=True)
         group = group_serializer.save()
