@@ -86,7 +86,7 @@ class AvailabilityViewSet(viewsets.ModelViewSet):
         """
         availability_queryset = Availability.objects.filter(user_id=pk)
         if not availability_queryset.exists():
-            return Response({"detail": "해당 사용자의 Availability 데이터가 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "해당 사용자의 Availability 데이터가 없습니다."})
         
         serializer = self.get_serializer(availability_queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
